@@ -1,0 +1,109 @@
+﻿<html>
+<head>
+    <meta charset="utf-8"></meta>
+    <title>Example of Terrain-RGB</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css" rel="stylesheet"></link>
+    <script type="text/javascript" src="js/Stats.min.js?ver=timeVer"></script>
+
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGluOTAzMyIsImEiOiJja3FzNHlvZGoxN2kzMm9wYjFpNWhoaGpnIn0.pKD8tCy-303dGC21OHDdOg';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        zoom: 13.1,
+        center: [121.5856, 25.0232],
+        //pitch: 85,
+        //bearing: 80,
+          //style: 'mapbox://styles/mapbox-map-design/ckhqrf2tz0dt119ny6azh975y',//mapbox://styles/mapbox/satellite-streets-v12
+          style: 'mapbox://styles/mapbox/satellite-streets-v12',
+          //style: 'mapbox://styles/mapbox/satellite-v9',//無中文字;不會發生  glyphs > 65535 not supported 錯誤
+          //style: 'mapbox://styles/mapbox/streets-v12',
+          language: "zh-Hant",
+          projection: 'globe',//預設 投影模式 (若都不指定,系統有時會不穏定,err!!,ex:zoom=2時 )
+        hash: true
+      });
+
+      map.on('load', function () {
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+            //'tiles': ['https://osmhacktw.github.io/terrain-rgb/tiles/{z}/{x}/{y}.png'],
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 256,
+          'maxzoom': 12
+        });
+        // add the DEM source as a terrain layer with exaggerated height
+          //map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        map.setTerrain({ 'source': 'mapbox-dem' });
+
+        //// add a sky layer that will show when the map is highly pitched
+        //map.addLayer({
+        //  'id': 'sky',
+        //  'type': 'sky',
+        //  'paint': {
+        //      'sky-type': 'atmosphere',
+        //      'sky-atmosphere-sun': [0.0, 0.0],
+        //      'sky-atmosphere-sun-intensity': 15
+        //  }
+        //});
+
+
+        
+
+      });
+
+        var stats = new Stats();
+
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.bottom = '0px';
+        stats.domElement.style.zIndex = 100;
+
+        stats.setMode(0);// 0: fps, 1: ms, 2: mb, 3+: custom
+
+        document.body.appendChild(stats.domElement);
+
+        map.on('render', function () {
+            //console.log("render");
+
+            //stats.update();
+        });
+
+        //執行 mapbox 動畫 繪圖:
+        let animation = window.requestAnimationFrame(frame);
+
+        let timeStart = new Date().getTime();
+        let time, dt,fps_browser,count;
+        count = 0;
+
+        function frame(time)
+        {
+            //console.log("frame");
+
+            stats.update();//最高 fps=60
+
+            time = new Date().getTime();
+            dt = (time - timeStart) / 1000;
+
+            count = count + 1;
+            fps_browser = count / dt;
+
+            console.log("fps_browser= " + fps_browser.toFixed(0));//最高 fps=60
+
+            window.requestAnimationFrame(frame);
+        }
+
+
+    </script>
+</body>
+</html>
